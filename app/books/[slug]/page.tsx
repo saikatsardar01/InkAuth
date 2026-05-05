@@ -20,24 +20,24 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ sl
   return (
     <main className="min-h-screen bg-background transition-colors duration-500">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
         <div className="flex flex-col lg:flex-row gap-16">
-          
+
           {/* Left Sidebar: Book Info */}
-          <div className="lg:w-1/3 lg:sticky lg:top-32 h-fit">
-            <div className="relative aspect-[3/4] w-full max-w-sm mx-auto lg:mx-0 overflow-hidden rounded-3xl shadow-2xl mb-8 bg-accent flex items-center justify-center">
+          <div className="lg:w-[300px] lg:sticky lg:top-32 h-fit">
+            <div className="relative aspect-[3/4] w-full max-w-[280px] mx-auto lg:mx-0 overflow-hidden rounded-3xl shadow-2xl mb-8 bg-accent flex items-center justify-center">
               {book.cover_image ? (
                 <img src={book.cover_image} alt={book.title} className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <span className="text-6xl font-bold text-foreground/10">{book.title[0]}</span>
               )}
             </div>
-            
-            <div className="space-y-6 text-center lg:text-left">
+
+            <div className="space-y-6 text-justify">
               <div>
-                <h1 className="text-4xl font-bold tracking-tight mb-2 text-foreground">{book.title}</h1>
-                <p className="text-xl text-foreground/40 font-medium italic">{book.author}</p>
+                <h1 className="text-3xl font-bold tracking-tight mb-2 text-foreground">{book.title}</h1>
+                <p className="text-lg text-foreground/40 font-medium italic">{book.author}</p>
               </div>
 
               <div className="flex items-center justify-center lg:justify-start gap-6 py-4 border-y border-border">
@@ -48,19 +48,19 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ sl
                     <span className="font-bold text-foreground">{book.rating.toFixed(1)}</span>
                   </div>
                 </div>
-                <div className="flex flex-col items-center lg:items-start">
+                <div className="flex flex-col items-start">
                   <span className="text-xs font-bold uppercase tracking-widest text-foreground/30 mb-1">Chapters</span>
                   <span className="font-bold text-foreground">{book.total_chapters}</span>
                 </div>
-                <div className="flex flex-col items-center lg:items-start">
+                <div className="flex flex-col items-start">
                   <span className="text-xs font-bold uppercase tracking-widest text-foreground/30 mb-1">Status</span>
                   <span className="font-bold capitalize text-foreground">{book.status}</span>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/30 mb-3">Synopsis</h3>
-                <p className="text-foreground/60 leading-relaxed text-lg">
+                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground/30 mb-3 text-left">Synopsis</h3>
+                <p className="text-foreground/60 leading-relaxed text-base text-justify">
                   {book.description}
                 </p>
               </div>
@@ -69,9 +69,9 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ sl
                 <span className="inline-block px-4 py-1.5 bg-accent rounded-full text-xs font-bold uppercase tracking-widest text-foreground/70">
                   {book.genre}
                 </span>
-                <ShareButton 
-                  bookTitle={book.title} 
-                  description={book.description} 
+                <ShareButton
+                  bookTitle={book.title}
+                  description={book.description}
                 />
               </div>
             </div>
@@ -86,7 +86,7 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ sl
 
             <div className="space-y-3">
               {chapters.map((chapter) => (
-                <Link 
+                <Link
                   key={chapter.id}
                   href={`/books/${book.slug}/${chapter.slug}`}
                   prefetch={false}

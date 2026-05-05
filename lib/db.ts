@@ -37,6 +37,15 @@ export interface ChapterWithNav {
   nextChapter: { slug: string; chapter_number: number } | null;
 }
 
+export interface Genre {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon: string | null;
+  created_at: string;
+}
+
 /**
  * Normalization helper to convert Turso Row objects to plain JS objects.
  */
@@ -164,6 +173,46 @@ export async function getPaginatedBooks(limit: number = 6, offset: number = 0, q
     return rowsToObjects<Book>(result);
   } catch (error) {
     console.error("Error in getPaginatedBooks:", error);
+    return [];
+  }
+}
+
+export async function getGenres(): Promise<Genre[]> {
+  try {
+    const result = await turso.execute("SELECT * FROM genres ORDER BY name ASC");
+    return rowsToObjects<Genre>(result);
+  } catch (error) {
+    console.error("Error in getGenres:", error);
+    return [];
+  }
+}
+
+export async function getBooksByGenre(genreSlug: string): Promise<Book[]> {
+  try {
+    const result = await turso.execute({
+      sql: `SELECT b.* FROM book_summaries b 
+            JOIN genres g ON b.genre_id = g.id 
+            WHERE g.slug = ? 
+            ORDER BY b.created_at DESC`,
+      args: [genreSlug],
+    });
+    
+    const books = rowsToObjects<Book>(result);
+    
+    // Fallback if genre_id is not yet populated but genres table exists
+    if (books.length === 0) {
+      const resultFallback = await turso.execute({
+        sql: `SELECT * FROM book_summaries 
+              WHERE LOWER(REPLACE(genre, ' ', '-')) = ? 
+              ORDER BY created_at DESC`,
+        args: [genreSlug],
+      });
+      return rowsToObjects<Book>(resultFallback);
+    }
+    
+    return books;
+  } catch (error) {
+    console.error("Error in getBooksByGenre:", error);
     return [];
   }
 }

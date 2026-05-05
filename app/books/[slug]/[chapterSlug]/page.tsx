@@ -1,6 +1,7 @@
 import { getChapterBySlug } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import LatexRenderer from "@/components/LatexRenderer";
+import ScrollProgress from "@/components/ScrollProgress";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -20,6 +21,7 @@ export default async function ChapterPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="min-h-screen bg-background transition-colors duration-500">
+      <ScrollProgress />
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-32 pb-32">

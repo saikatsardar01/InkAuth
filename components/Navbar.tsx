@@ -8,17 +8,25 @@ import { ThemeToggle } from "./ThemeToggle";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const scrollY = window.scrollY;
+      setScrolled(scrollY > 20);
+      
+      // Hide navbar when scrolled deep (threshold for chapter content)
+      // On chapter pages, the content box reaches top around 350-400px
+      setIsHidden(scrollY > 350);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${
+    <nav className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${
+      isHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
+    } ${
       scrolled ? "bg-background/80 backdrop-blur-md shadow-sm py-3 border-b border-border" : "bg-transparent py-5"
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,7 +42,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/" prefetch={false} className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors">Home</Link>
             <Link href="/library" prefetch={false} className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors">Library</Link>
-            <Link href="/coming-soon" prefetch={false} className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors">Categories</Link>
+            <Link href="/categories" prefetch={false} className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors">Categories</Link>
             <ThemeToggle />
           </div>
  
@@ -59,7 +67,7 @@ export default function Navbar() {
         <div className="px-4 pt-2 pb-6 space-y-1">
           <Link href="/" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-foreground hover:bg-foreground/5 rounded-md">Home</Link>
           <Link href="/library" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-foreground hover:bg-foreground/5 rounded-md">Library</Link>
-          <Link href="/coming-soon" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-foreground hover:bg-foreground/5 rounded-md">Categories</Link>
+          <Link href="/categories" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-base font-medium text-foreground hover:bg-foreground/5 rounded-md">Categories</Link>
           
           <div className="pt-4 px-3">
             <button className="w-full bg-foreground text-background py-3 rounded-full font-medium shadow-lg">Get Started</button>
