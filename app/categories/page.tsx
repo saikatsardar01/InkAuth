@@ -90,6 +90,7 @@ export default async function CategoriesPage() {
                 <Link
                   key={genre.id}
                   href={`/categories/${genre.slug}`}
+                  prefetch={false}
                   className="group perspective-1000"
                 >
                   <div className={`

@@ -18,7 +18,7 @@ const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   skipWaiting: true,
   clientsClaim: true,
-  navigationPreload: false, // Disabled to avoid potential overhead causing latency
+  navigationPreload: true, // Disabled to avoid potential overhead causing latency
   runtimeCaching: defaultCache,
 });
 
