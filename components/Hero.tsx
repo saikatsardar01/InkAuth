@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 
 export default function Hero() {
@@ -19,9 +20,9 @@ export default function Hero() {
               Start Reading
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </a>
-            <button className="w-full sm:w-auto bg-card border border-border px-8 py-4 rounded-full font-medium hover:bg-accent transition-all text-foreground text-sm sm:text-base">
+            <Link href="/categories" className="w-full sm:w-auto bg-card border border-border px-8 py-4 rounded-full font-medium hover:bg-accent transition-all text-foreground text-sm sm:text-base">
               Browse Categories
-            </button>
+            </Link>
           </div>
         </div>
       </div>

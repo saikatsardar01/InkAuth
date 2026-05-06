@@ -74,7 +74,7 @@ export default function LibraryPage() {
   return (
     <main className="min-h-screen bg-background transition-colors duration-500 pb-32">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
         <div className="mb-16">
           <h1 className="text-5xl font-bold tracking-tight text-foreground mb-4">Library</h1>
@@ -85,15 +85,15 @@ export default function LibraryPage() {
         <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 mb-12">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by title or author..." 
+              placeholder="Search by title or author..."
               className="w-full bg-accent/30 border border-border rounded-2xl py-3 pl-12 pr-4 text-foreground placeholder:text-foreground/20 focus:outline-none focus:ring-2 focus:ring-foreground/10 transition-all"
             />
           </div>
-          <button 
+          <button
             type="submit"
             className="flex items-center justify-center gap-2 px-8 py-3 bg-foreground text-background rounded-2xl font-bold text-sm hover:opacity-90 transition-all"
           >
@@ -112,8 +112,8 @@ export default function LibraryPage() {
             {books.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-8 sm:gap-y-16">
                 {books.map((book) => (
-                  <BookCard 
-                    key={book.id + book.slug} 
+                  <BookCard
+                    key={book.id + book.slug}
                     slug={book.slug}
                     title={book.title}
                     author={book.author}
@@ -126,7 +126,7 @@ export default function LibraryPage() {
             ) : (
               <div className="text-center py-20">
                 <p className="text-xl font-medium text-foreground/40">No books found matching "{activeSearch}"</p>
-                <button 
+                <button
                   onClick={() => { setSearchQuery(""); setActiveSearch(""); fetchBooks(0, true, ""); }}
                   className="mt-4 text-foreground underline font-medium"
                 >
@@ -137,7 +137,7 @@ export default function LibraryPage() {
 
             {hasMore && books.length > 0 && (
               <div className="mt-20 flex justify-center">
-                <button 
+                <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
                   className="group relative px-12 py-4 bg-foreground text-background font-bold rounded-2xl overflow-hidden hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100"
@@ -148,7 +148,7 @@ export default function LibraryPage() {
                 </button>
               </div>
             )}
-            
+
             {!hasMore && books.length > 0 && (
               <p className="mt-20 text-center text-foreground/20 font-medium italic">You've reached the end of the collection.</p>
             )}

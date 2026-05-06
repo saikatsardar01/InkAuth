@@ -16,10 +16,10 @@ export default function BookCard({ slug, title, author, genre, rating, cover_ima
     <Link href={`/books/${slug}`} prefetch={false} className="group block w-full">
       <div className="relative aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl bg-accent mb-3 sm:mb-4 shadow-sm transition-all duration-500 group-hover:shadow-xl group-hover:-translate-y-2">
         {cover_image ? (
-          <Image 
-            src={cover_image} 
-            alt={title} 
-            fill 
+          <Image
+            src={cover_image}
+            alt={title}
+            fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
