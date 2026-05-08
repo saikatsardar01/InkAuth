@@ -1,6 +1,7 @@
 import { getBooksByGenre, getGenres } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import BookCard from "@/components/BookCard";
+import Footer from "@/components/Footer";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -76,6 +77,7 @@ function GenreLayout({ genreName, books, description }: { genreName: string; boo
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

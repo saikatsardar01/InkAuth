@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import BookCard from "@/components/BookCard";
+import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Loader2, Search, Filter } from "lucide-react";
 
@@ -72,10 +73,10 @@ export default function LibraryPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background transition-colors duration-500 pb-32">
+    <main className="min-h-screen bg-background transition-colors duration-500">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-32">
         <div className="mb-16">
           <h1 className="text-5xl font-bold tracking-tight text-foreground mb-4">Library</h1>
           <p className="text-foreground/40 font-medium">Explore our collection of stories and adventures.</p>
@@ -155,6 +156,7 @@ export default function LibraryPage() {
           </>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

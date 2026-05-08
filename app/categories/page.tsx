@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getGenres } from "@/lib/db";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import {
   ChevronRight,
   LayoutGrid,
@@ -61,7 +62,7 @@ export default async function CategoriesPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background mesh-gradient noise-bg overflow-x-hidden pb-32">
+    <main className="min-h-screen bg-background mesh-gradient noise-bg overflow-x-hidden">
       <Navbar />
 
       {/* Hero Section */}
@@ -79,7 +80,7 @@ export default async function CategoriesPage() {
       </div>
 
       {/* Categories Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-8 sm:gap-y-16">
           {genres.length > 0 ? (
             genres.map((genre) => {
@@ -150,6 +151,7 @@ export default async function CategoriesPage() {
           )}
         </div>
       </div>
+      <Footer />
     </main>
   );
 }
