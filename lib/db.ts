@@ -79,6 +79,21 @@ export async function getFeaturedBooks(limit: number = 6): Promise<Book[]> {
   }
 }
 
+export async function getPlatformPicks(): Promise<Book[]> {
+  try {
+    const result = await turso.execute(`
+      SELECT b.* 
+      FROM platform_pick p
+      JOIN book_summaries b ON p.book_id = (SELECT id FROM books WHERE slug = b.slug)
+      ORDER BY p.id ASC
+    `);
+    return rowsToObjects<Book>(result);
+  } catch (error) {
+    console.error("Error in getPlatformPicks:", error);
+    return [];
+  }
+}
+
 export async function getBookBySlug(slug: string): Promise<BookWithChapters | null> {
   try {
     const bookResult = await turso.execute({
