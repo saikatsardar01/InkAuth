@@ -1,25 +1,29 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Play, Pause, Volume2, VolumeX, Radio as RadioIcon, X } from 'lucide-react';
+import { useRadioStore } from '@/lib/radio-store';
 
-interface Station {
-  changeuuid: string;
-  name: string;
-  url_resolved: string;
-  favicon: string;
-  tags: string;
-}
+export default function RadioPlayer() {
+  const pathname = usePathname();
+  const { 
+    currentStation, 
+    isPlaying, 
+    setIsPlaying, 
+    volume, 
+    setVolume, 
+    isMuted, 
+    setIsMuted, 
+    isPlayerVisible, 
+    setIsPlayerVisible,
+    stopRadio 
+  } = useRadioStore();
 
-interface RadioPlayerProps {
-  currentStation: Station | null;
-  onClose?: () => void;
-}
+  const isRadioPage = pathname === '/radio';
+  // Visible if on radio page OR if toggled on other pages
+  const shouldShow = currentStation && (isRadioPage || isPlayerVisible);
 
-export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.8);
-  const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -56,34 +60,63 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
   };
 
   useEffect(() => {
-    if (currentStation && audioRef.current) {
-      // Set crossOrigin BEFORE setting src
-      audioRef.current.crossOrigin = "anonymous";
-      audioRef.current.src = currentStation.url_resolved;
-      audioRef.current.play().catch(err => {
-        console.error("Playback failed with CORS, trying without:", err);
-        // Fallback: If CORS fails, try without it (Boost will be disabled)
-        if (audioRef.current) {
-          audioRef.current.crossOrigin = null;
-          audioRef.current.src = currentStation.url_resolved;
-          audioRef.current.play();
-        }
-      });
-      setIsPlaying(true);
+    let isSubscribed = true;
 
-      if (audioContextRef.current?.state === 'suspended') {
-        audioContextRef.current.resume();
+    const playAudio = async () => {
+      if (currentStation && isPlaying && audioRef.current) {
+        try {
+          // Only set src if it's currently empty or different
+          if (!audioRef.current.src || audioRef.current.src !== currentStation.url_resolved) {
+            audioRef.current.crossOrigin = "anonymous";
+            audioRef.current.src = currentStation.url_resolved;
+          }
+          await audioRef.current.play();
+        } catch (err: any) {
+          if (err.name === 'AbortError') return;
+          if (err.name === 'NotAllowedError') {
+            console.warn("Autoplay blocked. User interaction required to play.");
+            if (isSubscribed) setIsPlaying(false);
+            return;
+          }
+          
+          console.error("Playback failed with CORS, trying without:", err);
+          if (isSubscribed && audioRef.current) {
+            try {
+              audioRef.current.crossOrigin = null;
+              audioRef.current.src = currentStation.url_resolved;
+              await audioRef.current.play();
+            } catch (fallbackErr: any) {
+              if (fallbackErr.name === 'NotAllowedError') {
+                if (isSubscribed) setIsPlaying(false);
+              } else if (fallbackErr.name !== 'AbortError') {
+                console.error("Final playback failed:", fallbackErr);
+              }
+            }
+          }
+        }
+      } else if (audioRef.current && !isPlaying) {
+        // STOP connection on pause to save data
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        audioRef.current.load(); // Force release the stream
       }
+    };
+
+    playAudio();
+
+    if (currentStation && audioContextRef.current?.state === 'suspended') {
+      audioContextRef.current.resume();
     }
-  }, [currentStation]);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [currentStation, isPlaying, setIsPlaying]);
 
   useEffect(() => {
     if (gainNodeRef.current) {
-      // Secretly boost by 2.5x so 100% on UI sounds like 250%
       gainNodeRef.current.gain.value = isMuted ? 0 : (volume * 2.5);
     }
-    // Keep the audio element's internal volume at 1.0 (max) 
-    // so the GainNode has the full signal to work with
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : 1;
     }
@@ -93,14 +126,14 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
     initAudioContext();
     if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.pause();
+        // Store will trigger the useEffect to stop the src
+        setIsPlaying(false);
       } else {
         if (audioContextRef.current?.state === 'suspended') {
           audioContextRef.current.resume();
         }
-        audioRef.current.play().catch(err => console.error("Playback failed:", err));
+        setIsPlaying(true);
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -119,22 +152,39 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
     setIsMuted(!isMuted);
   };
 
-  if (!currentStation) return null;
+  // Handling Hydration for Persist
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl z-50 animate-in fade-in slide-in-from-bottom-10 duration-700">
-      {/* Moving Colorful Border Wrapper */}
-      <div className="relative p-[1px] rounded-[2.1rem] overflow-hidden group">
-        {/* Rotating Gradient Background */}
-        <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,#4f46e5,#7c3aed,#db2777,#f59e0b,#10b981,#4f46e5)] animate-[spin_4s_linear_infinite] opacity-50 group-hover:opacity-100 transition-opacity"></div>
+    <>
+      {/* Audio Element - ALWAYS in DOM to prevent interruption */}
+      <audio ref={audioRef} autoPlay />
 
-        <div className="relative glass-card rounded-[2rem] p-3 sm:p-5 shadow-2xl border border-white/10 flex flex-col gap-4 bg-background/80 backdrop-blur-2xl">
-          {/* Audio Element */}
-          <audio ref={audioRef} autoPlay />
+      {shouldShow && (
+        <div 
+          className="fixed left-1/2 z-50 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+          style={{ 
+            bottom: isPlayerVisible || isRadioPage ? '24px' : '-400px',
+            opacity: isPlayerVisible || isRadioPage ? 1 : 0,
+            transform: `translateX(-50%) translateY(${isPlayerVisible || isRadioPage ? '0' : '20px'})`,
+            width: '95%',
+            maxWidth: '42rem'
+          }}
+        >
+          {/* Moving Colorful Border Wrapper */}
+          <div className="relative p-[1px] rounded-[2.1rem] overflow-hidden group shadow-2xl">
+            {/* Rotating Gradient Background */}
+            <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,#4f46e5,#7c3aed,#db2777,#f59e0b,#10b981,#4f46e5)] animate-[spin_4s_linear_infinite] opacity-50 group-hover:opacity-100 transition-opacity"></div>
 
-          {/* Top Info Bar */}
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
+            <div className="relative glass-card rounded-[2rem] p-3 sm:p-5 border border-white/10 flex flex-col gap-4 bg-background/80 backdrop-blur-2xl">
+              {/* Top Info Bar */}
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -204,8 +254,9 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
               </button>
 
               <button
-                onClick={onClose}
-                className="p-3 text-foreground/20 hover:text-foreground transition-colors rounded-xl hover:bg-foreground/5"
+                onClick={stopRadio}
+                title="Turn off Radio"
+                className="p-3 text-foreground/20 hover:text-red-500 transition-colors rounded-xl hover:bg-red-500/10"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -242,6 +293,8 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
           </div>
         </div>
       </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }

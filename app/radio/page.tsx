@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StationCard from "@/components/StationCard";
-import RadioPlayer from "@/components/RadioPlayer";
+import { useRadioStore } from '@/lib/radio-store';
 import { Search, Radio as RadioIcon, Loader2, Sparkles, Activity } from 'lucide-react';
 
 interface Station {
@@ -17,12 +17,12 @@ interface Station {
 }
 
 export default function RadioPage() {
+  const { currentStation, setCurrentStation } = useRadioStore();
   const [stations, setStations] = useState<Station[]>([]);
   const [filteredStations, setFilteredStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchInputValue, setSearchInputValue] = useState('');
   const [activeSearchQuery, setActiveSearchQuery] = useState('');
-  const [currentStation, setCurrentStation] = useState<Station | null>(null);
   const [visibleCount, setVisibleCount] = useState(10);
 
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function RadioPage() {
       handleSearch();
     }
   };
+
 
   const handlePlay = (station: Station) => {
     setCurrentStation(station);
@@ -177,10 +178,6 @@ export default function RadioPage() {
         )}
       </div>
 
-      <RadioPlayer
-        currentStation={currentStation}
-        onClose={() => setCurrentStation(null)}
-      />
 
       <Footer />
     </main>

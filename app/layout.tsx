@@ -1,7 +1,10 @@
+import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import RadioPlayer from "@/components/RadioPlayer";
+import RadioToggle from "@/components/RadioToggle";
 import Script from "next/script";
 
 const geistSans = Geist({
@@ -109,6 +112,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
         <ThemeProvider attribute="class" defaultTheme="system">
           {children}
+          <RadioPlayer />
+          <RadioToggle />
         </ThemeProvider>
       </body>
       {process.env.NEXT_PUBLIC_GA_ID && (
