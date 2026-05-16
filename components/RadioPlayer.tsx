@@ -21,20 +21,83 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+  const initAudioContext = () => {
+    if (audioRef.current && !audioContextRef.current) {
+      try {
+        const AudioContextClass = (window.AudioContext || (window as any).webkitAudioContext);
+        const ctx = new AudioContextClass();
+        
+        const source = ctx.createMediaElementSource(audioRef.current);
+        const compressor = ctx.createDynamicsCompressor();
+        const gain = ctx.createGain();
+        
+        // Professional Radio Compression settings for 'Loudness'
+        compressor.threshold.setValueAtTime(-20, ctx.currentTime);
+        compressor.knee.setValueAtTime(30, ctx.currentTime);
+        compressor.ratio.setValueAtTime(4, ctx.currentTime);
+        compressor.attack.setValueAtTime(0.003, ctx.currentTime);
+        compressor.release.setValueAtTime(0.25, ctx.currentTime);
+
+        source.connect(compressor);
+        compressor.connect(gain);
+        gain.connect(ctx.destination);
+
+        audioContextRef.current = ctx;
+        gainNodeRef.current = gain;
+        sourceNodeRef.current = source;
+      } catch (err) {
+        console.error("AudioContext initialization failed:", err);
+      }
+    }
+  };
 
   useEffect(() => {
     if (currentStation && audioRef.current) {
+      // Set crossOrigin BEFORE setting src
+      audioRef.current.crossOrigin = "anonymous";
       audioRef.current.src = currentStation.url_resolved;
-      audioRef.current.play().catch(err => console.error("Playback failed:", err));
+      audioRef.current.play().catch(err => {
+        console.error("Playback failed with CORS, trying without:", err);
+        // Fallback: If CORS fails, try without it (Boost will be disabled)
+        if (audioRef.current) {
+          audioRef.current.crossOrigin = null;
+          audioRef.current.src = currentStation.url_resolved;
+          audioRef.current.play();
+        }
+      });
       setIsPlaying(true);
+
+      if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
     }
   }, [currentStation]);
 
+  useEffect(() => {
+    if (gainNodeRef.current) {
+      // Secretly boost by 2.5x so 100% on UI sounds like 250%
+      gainNodeRef.current.gain.value = isMuted ? 0 : (volume * 2.5);
+    }
+    // Keep the audio element's internal volume at 1.0 (max) 
+    // so the GainNode has the full signal to work with
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : 1;
+    }
+  }, [volume, isMuted]);
+
   const togglePlay = () => {
+    initAudioContext();
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
+        if (audioContextRef.current?.state === 'suspended') {
+          audioContextRef.current.resume();
+        }
         audioRef.current.play().catch(err => console.error("Playback failed:", err));
       }
       setIsPlaying(!isPlaying);
@@ -42,21 +105,18 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    initAudioContext();
+    if (audioContextRef.current?.state === 'suspended') {
+      audioContextRef.current.resume();
+    }
     const value = parseFloat(e.target.value);
     setVolume(value);
-    if (audioRef.current) {
-      audioRef.current.volume = value;
-    }
     if (value === 0) setIsMuted(true);
     else setIsMuted(false);
   };
 
   const toggleMute = () => {
-    if (audioRef.current) {
-      const newMuted = !isMuted;
-      setIsMuted(newMuted);
-      audioRef.current.volume = newMuted ? 0 : volume;
-    }
+    setIsMuted(!isMuted);
   };
 
   if (!currentStation) return null;
@@ -88,8 +148,8 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
                 <div
                   key={i}
                   className={`w-0.5 rounded-full transition-all duration-300 ${isPlaying
-                      ? 'bg-gradient-to-t from-amber-500 to-orange-400 animate-[bounce_1s_infinite]'
-                      : 'bg-foreground/10 h-1'
+                    ? 'bg-gradient-to-t from-amber-500 to-orange-400 animate-[bounce_1s_infinite]'
+                    : 'bg-foreground/10 h-1'
                     }`}
                   style={{
                     height: isPlaying ? `${Math.random() * 100 + 20}%` : '20%',
@@ -153,10 +213,21 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
           </div>
 
           {/* Volume Bar */}
-          <div className="flex items-center gap-4 px-2 pt-2 border-t border-white/5">
-            <button onClick={toggleMute} className="text-foreground/40 hover:text-foreground transition-colors">
-              {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </button>
+          <div className="flex flex-col gap-2 px-2 pt-2 border-t border-white/5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button onClick={toggleMute} className="text-foreground/40 hover:text-foreground transition-colors">
+                  {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+                <span className="text-[10px] font-black uppercase tracking-wider text-foreground/40">
+                  Volume
+                </span>
+              </div>
+              <span className="text-[10px] font-black tabular-nums text-foreground/40">
+                {Math.round((isMuted ? 0 : volume) * 100)}%
+              </span>
+            </div>
+
             <div className="flex-1 relative group h-6 flex items-center">
               <input
                 type="range"
@@ -165,12 +236,9 @@ export default function RadioPlayer({ currentStation, onClose }: RadioPlayerProp
                 step="0.01"
                 value={isMuted ? 0 : volume}
                 onChange={handleVolumeChange}
-                className="w-full h-1 bg-foreground/10 rounded-full appearance-none cursor-pointer accent-amber-500"
+                className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-foreground/10 accent-amber-500 transition-all duration-300"
               />
             </div>
-            <span className="text-[9px] font-black text-foreground/30 tabular-nums w-8">
-              {Math.round((isMuted ? 0 : volume) * 100)}%
-            </span>
           </div>
         </div>
       </div>
