@@ -1,6 +1,6 @@
-# 📚 Teazon
+# 📚 Ink Auth
 
-Teazon is a modern **digital reading platform** for books, blogs, and radio-inspired learning experiences. It combines structured reading, audio streaming, and a clean UI to create an immersive knowledge ecosystem.
+Ink Auth is a modern **digital reading platform** for books, blogs, and radio-inspired learning experiences. It combines structured reading, audio streaming, and a clean UI to create an immersive knowledge ecosystem.
 
 🌐 Live: https://www.inkauth.in/ 
 
@@ -26,7 +26,7 @@ Teazon is a modern **digital reading platform** for books, blogs, and radio-insp
 <summary>Click to expand</summary>
 
 ```text
-teazon
+Ink Auth
 ├── app
 │   ├── api
 │   │   ├── books
@@ -185,4 +185,4 @@ Built by Saikat Sardar
 
 ## ❤️ About
 
-Teazon is designed to unify reading, learning, and audio experiences into one seamless platform.
+Ink Auth is designed to unify reading, learning, and audio experiences into one seamless platform.
