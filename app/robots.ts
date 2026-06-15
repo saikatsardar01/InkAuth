@@ -9,6 +9,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/_next/"],
       },
     ],
-    sitemap: "https://inkauth.in/sitemap.xml",
+    sitemap: [
+      "https://inkauth.in/sitemap.xml",
+      "https://inkauth.in/blog-sitemap.xml",
+    ],
   };
 }

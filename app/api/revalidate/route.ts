@@ -1,33 +1,37 @@
-import { revalidatePath } from 'next/cache';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { path, secret } = body;
 
-    // You can set REVALIDATE_SECRET in your Cloudflare/Vercel environment variables
-    // and send it from your admin dashboard to secure this endpoint.
-    if (!process.env.REVALIDATE_SECRET) {
-      return NextResponse.json({ message: 'Server missing REVALIDATE_SECRET' }, { status: 500 });
+    // Secure webhook token check
+    if (secret !== "inkauth-secret-token") {
+      return NextResponse.json({ message: "Invalid token secret" }, { status: 401 });
     }
 
-    if (secret !== process.env.REVALIDATE_SECRET) {
-      return NextResponse.json({ message: 'Invalid secret token' }, { status: 401 });
+    if (path) {
+      revalidatePath(path);
+      
+      // If it's a specific post, revalidate general listing elements as well
+      if (path.startsWith("/blog/")) {
+        revalidatePath("/blog");
+        revalidatePath("/blog-sitemap.xml");
+        revalidatePath("/rss.xml");
+      }
+      
+      return NextResponse.json({ revalidated: true, path, now: Date.now() });
     }
 
-    if (!path) {
-      return NextResponse.json({ message: 'Missing path parameter' }, { status: 400 });
-    }
-
-    revalidatePath(path);
+    // Default global blog invalidation
+    revalidatePath("/blog");
+    revalidatePath("/blog-sitemap.xml");
+    revalidatePath("/rss.xml");
     
-    return NextResponse.json({ 
-      revalidated: true, 
-      path, 
-      message: `Successfully revalidated ${path}` 
-    });
-  } catch (err) {
-    return NextResponse.json({ message: 'Error revalidating' }, { status: 500 });
+    return NextResponse.json({ revalidated: true, message: "Global blog cache purged" });
+  } catch (err: any) {
+    console.error("Cache invalidation hook error:", err);
+    return NextResponse.json({ message: "Revalidation failed", error: err.message }, { status: 500 });
   }
 }

@@ -41,6 +41,7 @@ export default function Navbar() {
             <Link href="/" prefetch={false} className="text-lg font-medium text-foreground/60 hover:text-foreground transition-colors">Home</Link>
             <Link href="/library" prefetch={false} className="text-lg font-medium text-foreground/60 hover:text-foreground transition-colors">Library</Link>
             <Link href="/categories" prefetch={false} className="text-lg font-medium text-foreground/60 hover:text-foreground transition-colors">Categories</Link>
+            <Link href="/blog" prefetch={false} className="text-lg font-medium text-foreground/60 hover:text-foreground transition-colors">Blog</Link>
             <Link href="/radio" prefetch={false} className="text-lg font-medium text-foreground/60 hover:text-foreground transition-colors flex items-center gap-1.5">
               Radio
               <span className="relative flex h-2.5 w-2.5">
@@ -72,6 +73,7 @@ export default function Navbar() {
           <Link href="/" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-lg font-medium text-foreground hover:bg-foreground/5 rounded-md">Home</Link>
           <Link href="/library" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-lg font-medium text-foreground hover:bg-foreground/5 rounded-md">Library</Link>
           <Link href="/categories" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-lg font-medium text-foreground hover:bg-foreground/5 rounded-md">Categories</Link>
+          <Link href="/blog" prefetch={false} onClick={() => setIsOpen(false)} className="block px-3 py-2 text-lg font-medium text-foreground hover:bg-foreground/5 rounded-md">Blog</Link>
           <Link href="/radio" prefetch={false} onClick={() => setIsOpen(false)} className="px-3 py-2 text-lg font-medium text-foreground hover:bg-foreground/5 rounded-md flex items-center gap-2">
             Radio
             <span className="relative flex h-2 w-2">
