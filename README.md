@@ -1,184 +1,188 @@
-# 📚 InkAuth
+# 📚 Teazon
 
-<div align="center">
+Teazon is a modern **digital reading platform** for books, blogs, and radio-inspired learning experiences. It combines structured reading, audio streaming, and a clean UI to create an immersive knowledge ecosystem.
 
-![InkAuth Banner](https://img.shields.io/badge/Platform-Online%20Book%20Reading-blue?style=for-the-badge)
-
-### Read. Discover. Learn.
-
-A modern online book reading platform designed to provide readers with a seamless and immersive digital reading experience.
-
-🌐 **Live Website:** https://www.inkauth.in/
-
-</div>
+🌐 Live: https://www.inkauth.in/ 
 
 ---
 
-## ✨ About InkAuth
+## ✨ Features
 
-InkAuth is an online book reading platform where readers can discover, explore, and enjoy books from various genres through a clean and user-friendly interface.
-
-Built with a focus on performance, accessibility, and reader experience, InkAuth makes digital reading simple, engaging, and enjoyable.
-
----
-
-## 🚀 Features
-
-### 📖 Digital Reading Experience
-- Read books directly from the browser
-- Clean and distraction-free reading interface
-- Mobile-friendly design
-- Fast page loading
-
-### 🔍 Book Discovery
-- Browse available books
-- Explore different categories
-- Search for books easily
-- Organized content structure
-
-### 🌐 Modern Web Experience
-- Responsive design for all devices
-- SEO-friendly pages
-- Optimized performance
-- Smooth user navigation
-
-### 📚 Reader-Focused
-- Comfortable reading experience
-- Structured content presentation
-- Accessible interface
-- Modern UI/UX
-
----
-
-## 🛠 Tech Stack
-
-- Next.js
-- TypeScript
-- React
-- Tailwind CSS
-- PostgreSQL
-- Modern Web APIs
-
----
-
-## 🌍 Live Demo
-
-Visit the live platform:
-
-### 👉 https://www.inkauth.in/
+- 📖 Digital books with chapters and navigation
+- 📰 Blog system with categories and tags
+- 🔍 SEO-friendly routing (sitemap, RSS, robots)
+- 📻 Built-in radio player for continuous listening
+- 🧭 Smooth navigation with dynamic routes
+- 🌙 Theme support (light/dark mode)
+- ⚡ Fast performance with Next.js App Router
+- 📱 Fully responsive UI for all devices
+- 🔔 Newsletter and engagement components
 
 ---
 
 ## 📂 Project Structure
 
-```bash
-InkAuth/
-├── app/
-├── components/
-├── lib/
-├── public/
-├── styles/
-├── database/
-└── configuration/
+<details>
+<summary>Click to expand</summary>
+
+```text
+teazon
+├── app
+│   ├── api
+│   │   ├── books
+│   │   │   └── route.ts
+│   │   └── revalidate
+│   │       └── route.ts
+│   ├── blog
+│   │   ├── [slug]
+│   │   ├── category/[category]
+│   │   ├── tag/[tag]
+│   │   └── page.tsx
+│   ├── blog-sitemap.xml
+│   │   └── route.ts
+│   ├── books
+│   │   └── [slug]
+│   │       ├── page.tsx
+│   │       └── [chapterSlug]
+│   │           └── page.tsx
+│   ├── categories
+│   │   ├── [slug]
+│   │   └── page.tsx
+│   ├── coming-soon
+│   │   └── page.tsx
+│   ├── library
+│   │   └── page.tsx
+│   ├── privacy
+│   │   └── page.tsx
+│   ├── radio
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── terms
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── manifest.ts
+│   ├── not-found.tsx
+│   ├── page.tsx
+│   ├── robots.ts
+│   ├── rss.xml
+│   │   └── route.ts
+│   ├── sitemap.ts
+│   └── sw.ts
+│
+├── components
+│   ├── BlogSearch.tsx
+│   ├── BlogShareButtons.tsx
+│   ├── BookCard.tsx
+│   ├── ContributeBanner.tsx
+│   ├── Footer.tsx
+│   ├── Hero.tsx
+│   ├── LatexRenderer.tsx
+│   ├── Navbar.tsx
+│   ├── NewsletterCTA.tsx
+│   ├── RadioPlayer.tsx
+│   ├── RadioToggle.tsx
+│   ├── ScrollProgress.tsx
+│   ├── ShareButton.tsx
+│   ├── StationCard.tsx
+│   ├── TableOfContents.tsx
+│   ├── ThemeProvider.tsx
+│   └── ThemeToggle.tsx
+│
+├── lib
+│   ├── blog-db.ts
+│   ├── db.ts
+│   ├── radio-store.ts
+│   ├── schema.sql
+│   ├── turso.ts
+│   └── blog-migration.sql
+│
+├── public
+│   ├── icons
+│   │   ├── icon-192x192.png
+│   │   └── icon-512x512.png
+│   ├── sw.js
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+│
+├── middleware.ts
+├── next.config.ts
+├── package.json
+├── tsconfig.json
+└── postcss.config.mjs
 ```
 
-## ⚡ Getting Started
+</details>
 
-### Clone the Repository
+---
 
-```bash
-git clone https://github.com/saikatsardar01/InkAuth.git
-cd InkAuth
-```
+## 🛠 Tech Stack
 
-### Install Dependencies
+- Next.js (App Router)
+- TypeScript
+- React
+- Tailwind CSS
+- Turso / SQLite
+- Service Workers (PWA support)
+- RSS + SEO tooling
+
+---
+
+## 🚀 Getting Started
+
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### Configure Environment Variables
-
-Create a `.env.local` file:
-
-```env
-DATABASE_URL=your_database_url
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### Start Development Server
+### 2. Run development server
 
 ```bash
 npm run dev
 ```
 
-Open:
-
-```text
-http://localhost:3000
-```
+Open: http://localhost:3000
 
 ---
 
-## 🎯 Vision
+## 📡 Features Overview
 
-InkAuth aims to make knowledge and literature more accessible through a modern digital platform that prioritizes readability, accessibility, and user experience.
+### 📖 Books System
+- Multi-chapter reading experience
+- Dynamic routing per book and chapter
 
----
+### 📰 Blog System
+- Categories & tags
+- SEO optimized pages
+- RSS feed support
 
-## 🤝 Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-2. Create your feature branch
-
-```bash
-git checkout -b feature/new-feature
-```
-
-3. Commit your changes
-
-```bash
-git commit -m "Add new feature"
-```
-
-4. Push to the branch
-
-```bash
-git push origin feature/new-feature
-```
-
-5. Open a Pull Request
+### 📻 Radio System
+- Live station streaming
+- Mini player + toggle UI
+- Background listening support
 
 ---
 
-## ⭐ Support
+## 🔍 SEO & Performance
 
-If you like this project, consider giving it a star on GitHub.
-
-```bash
-⭐ Star the repository
-🍴 Fork the project
-🚀 Share it with others
-```
+- Sitemap generation
+- Robots.txt
+- RSS feed
+- Service worker caching
+- Optimized routing with Next.js
 
 ---
 
 ## 👨‍💻 Author
 
-**Saikat Sardar**
-
-GitHub: https://github.com/saikatsardar01
-
-Website: https://www.inkauth.in/
+Built by Saikat Sardar
 
 ---
 
-<div align="center">
+## ❤️ About
 
-### 📚 InkAuth — Where Stories Come Alive
-
-Made with ❤️ for readers.
-
-</div>
+Teazon is designed to unify reading, learning, and audio experiences into one seamless platform.
